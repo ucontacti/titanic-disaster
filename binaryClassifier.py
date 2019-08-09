@@ -91,6 +91,21 @@ X_train,X_test,y_train,y_test = train_test_split(all_features,Targeted_feature)
 X_train.shape,X_test.shape,y_train.shape,y_test.shape
 
 
+# In[]: SVM
+
+from sklearn import svm
+clf = svm.SVC(gamma='scale').fit(X_train, y_train)
+prediction_rm=clf.predict(X_test)
+print('--------------The Accuracy of the model----------------------------')
+print('The accuracy of the SVM Classifier is', round(accuracy_score(prediction_rm,y_test)*100,2))
+kfold = KFold(n_splits=10, random_state=22) # k=10, split the data into 10 equal parts
+result_rm=cross_val_score(clf,all_features,Targeted_feature,cv=10,scoring='accuracy')
+print('The cross validated score for SVM Classifier is:',round(result_rm.mean()*100,2))
+y_pred = cross_val_predict(clf,all_features,Targeted_feature,cv=10)
+sns.heatmap(confusion_matrix(Targeted_feature,y_pred),annot=True,fmt='3.0f',cmap="summer")
+plt.title('Confusion_matrix', y=1.05, size=15)
+
+
 # In[15]: Logistic Regression
 
 from sklearn.linear_model import LogisticRegression
