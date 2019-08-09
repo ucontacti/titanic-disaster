@@ -87,11 +87,27 @@ from sklearn.model_selection import cross_val_predict #prediction
 from sklearn.metrics import confusion_matrix #for confusion matrix
 all_features = traindf.drop("Survived",axis=1)
 Targeted_feature = traindf["Survived"]
-X_train,X_test,y_train,y_test = train_test_split(all_features,Targeted_feature,test_size=0.3,random_state=42)
+X_train,X_test,y_train,y_test = train_test_split(all_features,Targeted_feature)
 X_train.shape,X_test.shape,y_train.shape,y_test.shape
 
 
-# In[15]: Random Forest Learning
+# In[15]: Logistic Regression
+
+from sklearn.linear_model import LogisticRegression
+clf = LogisticRegression(random_state=0, solver='lbfgs').fit(X_train, y_train)
+prediction_rm=clf.predict(X_test)
+print('--------------The Accuracy of the model----------------------------')
+print('The accuracy of the Logistic Regression Classifier is', round(accuracy_score(prediction_rm,y_test)*100,2))
+kfold = KFold(n_splits=10, random_state=22) # k=10, split the data into 10 equal parts
+result_rm=cross_val_score(clf,all_features,Targeted_feature,cv=10,scoring='accuracy')
+print('The cross validated score for Logistic Regression Classifier is:',round(result_rm.mean()*100,2))
+y_pred = cross_val_predict(clf,all_features,Targeted_feature,cv=10)
+sns.heatmap(confusion_matrix(Targeted_feature,y_pred),annot=True,fmt='3.0f',cmap="summer")
+plt.title('Confusion_matrix', y=1.05, size=15)
+
+
+
+# In[16]: Random Forest Learning
 
 
 from sklearn.ensemble import RandomForestClassifier
@@ -111,7 +127,7 @@ sns.heatmap(confusion_matrix(Targeted_feature,y_pred),annot=True,fmt='3.0f',cmap
 plt.title('Confusion_matrix', y=1.05, size=15)
 
 
-# In[16]: Tuning
+# In[17]: Tuning
 
 
 model = RandomForestClassifier(criterion='gini', n_estimators=700,
@@ -157,20 +173,6 @@ def plotClusters(X, k, clusters, filename=None):
     else:
         plt.savefig(filename)
     plt.close()
-
-def missingdata(data):
-    total = data.isnull().sum().sort_values(ascending=False)
-    percent = (data.isnull().sum()/data.isnull().count()
-                * 100).sort_values(ascending=False)
-    ms = pd.concat([total, percent], axis=1, keys=['Total', 'Percent'])
-    ms = ms[ms["Percent"] > 0]
-    f, ax = plt.subplots(figsize=(8, 6))
-    plt.xticks(rotation='90')
-    fig = sns.barplot(ms.index, ms["Percent"], color="green", alpha=0.8)
-    plt.xlabel('Features', fontsize=15)
-    plt.ylabel('Percent of missing values', fontsize=15)
-    plt.title('Percent missing data by feature', fontsize=15)
-    return ms
 
 
 def linearClassifier(X, y):  # TODO: lift data
