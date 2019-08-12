@@ -1,0 +1,8 @@
+numpy
+pandas
+matplotlib
+seaborn
+jsonschema
+scikit-learn
+setuptools
+jupyter
